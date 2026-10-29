@@ -127,19 +127,25 @@ void yuv2rgb(int y, int u, int v, unsigned char* r, unsigned char* g,
     int b1 = (298 * c + 516 * d + 128) >> 8;
 
     // Computed values may need clipping.
-    if (r1 > 255)
+    if (r1 > 255) {
         r1 = 255;
-    if (g1 > 255)
+    }
+    if (g1 > 255) {
         g1 = 255;
-    if (b1 > 255)
+    }
+    if (b1 > 255) {
         b1 = 255;
+    }
 
-    if (r1 < 0)
+    if (r1 < 0) {
         r1 = 0;
-    if (g1 < 0)
+    }
+    if (g1 < 0) {
         g1 = 0;
-    if (b1 < 0)
+    }
+    if (b1 < 0) {
         b1 = 0;
+    }
 
     *r = r1;
     *g = g1;
@@ -233,8 +239,9 @@ int readFrame(mqd_t messageQueue, const std::vector<Buffer>& buffers,
     syslog(LOG_INFO, "Reading Image");
     mq_send(messageQueue, (char*)&buffer, sizeof(Buffer), 0);
 
-    if (-1 == xioctl(fileDescriptor, VIDIOC_QBUF, &buf))
+    if (-1 == xioctl(fileDescriptor, VIDIOC_QBUF, &buf)) {
         errnoExit("VIDIOC_QBUF");
+    }
 
     return 1;
 }
@@ -262,8 +269,9 @@ void* processImages(void* arg) {
 
 void stopCapturing(int fd) {
     enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (-1 == util::xioctl(fd, VIDIOC_STREAMOFF, &type))
+    if (-1 == util::xioctl(fd, VIDIOC_STREAMOFF, &type)) {
         util::errnoExit("VIDIOC_STREAMOFF");
+    }
 }
 
 void startCapturing(int fd, unsigned int numBuffers) {
@@ -279,20 +287,24 @@ void startCapturing(int fd, unsigned int numBuffers) {
         buf.memory = V4L2_MEMORY_MMAP;
         buf.index = i;
 
-        if (-1 == util::xioctl(fd, VIDIOC_QBUF, &buf))
+        if (-1 == util::xioctl(fd, VIDIOC_QBUF, &buf)) {
             util::errnoExit("VIDIOC_QBUF");
+        }
     }
     type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (-1 == util::xioctl(fd, VIDIOC_STREAMON, &type))
+    if (-1 == util::xioctl(fd, VIDIOC_STREAMON, &type)) {
         util::errnoExit("VIDIOC_STREAMON");
+    }
 }
 
 void uninitDevice(std::vector<Buffer>* const buffers) {
     unsigned int i;
 
-    for (i = 0; i < buffers->size(); ++i)
-        if (-1 == munmap((*buffers)[i].start, (*buffers)[i].length))
+    for (i = 0; i < buffers->size(); ++i) {
+        if (-1 == munmap((*buffers)[i].start, (*buffers)[i].length)) {
             util::errnoExit("munmap");
+        }
+    }
 }
 
 void initMmap(int fd, const std::string& devName,
@@ -333,8 +345,9 @@ void initMmap(int fd, const std::string& devName,
         buf.memory = V4L2_MEMORY_MMAP;
         buf.index = i;
 
-        if (-1 == util::xioctl(fd, VIDIOC_QUERYBUF, &buf))
+        if (-1 == util::xioctl(fd, VIDIOC_QUERYBUF, &buf)) {
             util::errnoExit("VIDIOC_QUERYBUF");
+        }
 
         (*buffers)[i].length = buf.length;
         (*buffers)[i].start =
@@ -342,8 +355,9 @@ void initMmap(int fd, const std::string& devName,
                  PROT_READ | PROT_WRITE /* required */,
                  MAP_SHARED /* recommended */, fd, buf.m.offset);
 
-        if (MAP_FAILED == (*buffers)[i].start)
+        if (MAP_FAILED == (*buffers)[i].start) {
             util::errnoExit("mmap");
+        }
     }
 }
 
@@ -420,23 +434,27 @@ void initDevice(int fd, const std::string& devName, v4l2_format* const format,
     // fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
     format->fmt.pix.field = V4L2_FIELD_NONE;
 
-    if (-1 == xioctl(fd, VIDIOC_S_FMT, format))
+    if (-1 == xioctl(fd, VIDIOC_S_FMT, format)) {
         errnoExit("VIDIOC_S_FMT");
+    }
 
     /* Buggy driver paranoia. */
     min = format->fmt.pix.width * 2;
-    if (format->fmt.pix.bytesperline < min)
+    if (format->fmt.pix.bytesperline < min) {
         format->fmt.pix.bytesperline = min;
+    }
     min = format->fmt.pix.bytesperline * format->fmt.pix.height;
-    if (format->fmt.pix.sizeimage < min)
+    if (format->fmt.pix.sizeimage < min) {
         format->fmt.pix.sizeimage = min;
+    }
 
     initMmap(fd, devName, buffers);
 }
 
 void closeDevice(int fd) {
-    if (-1 == close(fd))
+    if (-1 == close(fd)) {
         errnoExit("close");
+    }
 
     fd = -1;
 }
