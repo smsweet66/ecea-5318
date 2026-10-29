@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/smsweet/repos/ecea-5318/build/cmake_install.cmake",
+		"/home/smsweet/repos/ecea-5318/build/src/cmake_install.cmake",
+		"/home/smsweet/repos/ecea-5318/build/src/util/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
