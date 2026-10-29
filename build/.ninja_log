@@ -1,5 +1,0 @@
-# ninja log v7
-1	145	1793242284321019589	src/CMakeFiles/clock-reader.dir/main.cpp.o	a6b5f4037cc11678
-1	158	1793242284319215598	src/util/CMakeFiles/util.dir/util.cpp.o	2ad8a97608278f25
-159	179	1793242284477213539	src/util/libutil.a	d014f1592cc47da
-179	237	1793242284498213266	src/clock-reader	7246a2641cde30b4
